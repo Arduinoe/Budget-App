@@ -8,61 +8,100 @@
   <title>budget tascabile</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto Mono', monospace; }
-    html, body { width: 100%; min-height: 100%; background: #333; overflow-x: hidden; }
-    body { padding: 0; }
-
-    .screen {
-      width: 100%;
-      
-      min-height: 100dvh;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: 'Roboto Mono', monospace;
       background: #333;
-      padding: max(env(safe-area-inset-top), 32px) 18px max(env(safe-area-inset-bottom), 24px);
+      color: #e0e0e0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: 32px 18px 40px;
+      -webkit-tap-highlight-color: transparent;
     }
-
     .page { display: none; }
     .page.active { display: block; }
 
-    /* HOME */
     .home-title { font-size: 11px; color: #666; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 20px; }
-    .proj-card { background: #2e2e2e; border: 1px solid #3e3e3e; border-radius: 8px; padding: 14px; margin-bottom: 10px; cursor: pointer; transition: border-color 0.2s; }
-    .proj-card:hover { border-color: #555; }
+
+    .proj-card {
+      background: #2e2e2e;
+      border: 1px solid #3e3e3e;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
     .proj-card.archived { opacity: 0.45; }
+    .proj-card-body {
+      padding: 14px 14px 10px;
+      cursor: pointer;
+    }
     .proj-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-    .proj-name { font-size: 13px; font-weight: 700; color: #e0e0e0; letter-spacing: 0.02em; }
+    .proj-name { font-size: 13px; font-weight: 700; color: #e0e0e0; }
     .proj-badge { font-size: 9px; padding: 2px 7px; border-radius: 2px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
     .badge-mensile { background: #1a2a3e; color: #60a5fa; }
     .badge-progetto { background: #2a1a3e; color: #c084fc; }
     .badge-archiviato { background: #2a2a2a; color: #666; }
-    .proj-bar-wrap { height: 3px; background: #3e3e3e; border-radius: 2px; overflow: hidden; margin-bottom: 8px; }
+    .proj-bar-wrap { height: 3px; background: #3e3e3e; border-radius: 2px; overflow: hidden; margin-bottom: 10px; }
     .proj-bar-fill { height: 100%; border-radius: 2px; }
-    .proj-footer { display: flex; justify-content: space-between; align-items: center; }
+    .proj-meta { display: flex; justify-content: space-between; }
     .proj-spent { font-size: 11px; color: #888; }
-    .proj-budget { font-size: 11px; color: #555; }
-    .proj-actions { display: flex; gap: 6px; }
-    .proj-act-btn { font-size: 9px; padding: 2px 8px; border-radius: 2px; border: 1px solid #484848; background: none; color: #888; cursor: pointer; font-family: 'Roboto Mono', monospace; letter-spacing: 0.06em; }
-    .proj-act-btn:active { border-color: #666; color: #ccc; }
-    .proj-act-btn.danger:active { border-color: #f87171; color: #f87171; }
-    .new-proj-btn { width: 100%; height: 44px; border-radius: 6px; border: 1px dashed #484848; background: none; color: #666; font-size: 11px; font-family: 'Roboto Mono', monospace; cursor: pointer; letter-spacing: 0.08em; margin-top: 4px; }
-    .new-proj-form { background: #2e2e2e; border: 1px solid #3e3e3e; border-radius: 8px; padding: 14px; margin-top: 12px; }
-    .form-label { font-size: 9px; color: #666; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 5px; display: block; }
-    .form-input { width: 100%; height: 44px; border-radius: 4px; border: 1px solid #484848; background: #272727; color: #e0e0e0; padding: 0 10px; font-size: 16px; font-family: 'Roboto Mono', monospace; margin-bottom: 12px; -webkit-appearance: none; }
-    .form-input:focus { outline: none; border-color: #666; }
-    .form-input::placeholder { color: #555; }
+    .proj-budget-lbl { font-size: 11px; color: #555; }
+
+    .proj-card-actions {
+      border-top: 1px solid #3e3e3e;
+      display: flex;
+    }
+    .proj-act-btn {
+      flex: 1;
+      height: 38px;
+      border: none;
+      background: none;
+      font-size: 10px;
+      font-family: 'Roboto Mono', monospace;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      color: #888;
+    }
+    .proj-act-btn + .proj-act-btn { border-left: 1px solid #3e3e3e; }
+    .proj-act-btn.danger { color: #f87171; }
+
+    .new-proj-btn { width: 100%; height: 48px; border-radius: 6px; border: 1px dashed #484848; background: none; color: #666; font-size: 12px; font-family: 'Roboto Mono', monospace; cursor: pointer; letter-spacing: 0.08em; margin-top: 4px; }
+    .new-proj-form { background: #2e2e2e; border: 1px solid #3e3e3e; border-radius: 8px; padding: 14px; margin-top: 12px; display: none; }
+    .form-label { font-size: 9px; color: #666; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; display: block; }
+
+    input[type="text"], input[type="number"] {
+      display: block;
+      width: 100%;
+      height: 48px;
+      border-radius: 4px;
+      border: 1px solid #484848;
+      background: #272727;
+      color: #e0e0e0;
+      padding: 0 12px;
+      font-size: 16px;
+      font-family: 'Roboto Mono', monospace;
+      margin-bottom: 12px;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input[type="text"]:focus, input[type="number"]:focus { border-color: #666; }
+    input::placeholder { color: #555; }
+
     .type-row { display: flex; gap: 6px; margin-bottom: 12px; }
-    .type-btn { flex: 1; height: 36px; border-radius: 3px; border: 1px solid #484848; background: none; font-size: 11px; font-family: 'Roboto Mono', monospace; color: #888; cursor: pointer; letter-spacing: 0.04em; }
+    .type-btn { flex: 1; height: 40px; border-radius: 3px; border: 1px solid #484848; background: none; font-size: 12px; font-family: 'Roboto Mono', monospace; color: #888; cursor: pointer; letter-spacing: 0.04em; }
     .type-btn.active-mensile { background: #1a2a3e; color: #60a5fa; border-color: #60a5fa; }
     .type-btn.active-progetto { background: #2a1a3e; color: #c084fc; border-color: #c084fc; }
-    .confirm-btns { display: flex; gap: 8px; margin-top: 4px; }
+    .confirm-btns { display: flex; gap: 8px; }
 
-    /* BUDGET PAGE */
     .back-btn { display: flex; align-items: center; gap: 6px; background: none; border: none; color: #888; font-size: 12px; font-family: 'Roboto Mono', monospace; cursor: pointer; padding: 0; margin-bottom: 20px; letter-spacing: 0.06em; }
-    .page-title { font-size: 15px; font-weight: 700; color: #e0e0e0; letter-spacing: 0.04em; margin-bottom: 4px; }
+    .page-title { font-size: 15px; font-weight: 700; color: #e0e0e0; margin-bottom: 4px; }
     .page-subtitle { font-size: 9px; color: #555; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 20px; }
     .balance-area { margin-bottom: 20px; padding-bottom: 18px; border-bottom: 1px solid #3e3e3e; }
     .balance-lbl { font-size: 10px; color: #777; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 5px; }
     .balance-num { font-size: 40px; font-weight: 700; letter-spacing: -1px; line-height: 1; }
-    .balance-sub { font-size: 10px; color: #555; margin-top: 5px; letter-spacing: 0.06em; }
+    .balance-sub { font-size: 10px; color: #555; margin-top: 5px; }
     .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
     .stat-card { background: #2e2e2e; border: 1px solid #3e3e3e; border-radius: 8px; padding: 12px; }
     .stat-lbl { font-size: 9px; color: #777; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 5px; }
@@ -72,8 +111,7 @@
     .bar-section { margin-bottom: 18px; }
     .budget-input-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
     .budget-input-wrap label { font-size: 9px; color: #777; letter-spacing: 0.12em; text-transform: uppercase; }
-    .budget-val-input { width: 100px; height: 28px; border-radius: 4px; border: 1px solid #484848; background: #2e2e2e; color: #e0e0e0; padding: 0 8px; font-size: 16px; font-family: 'Roboto Mono', monospace; -webkit-appearance: none; }
-    .budget-val-input:focus { outline: none; border-color: #666; }
+    .budget-input-wrap input { width: 110px; height: 32px; margin-bottom: 0; }
     .bar-lbl-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
     .bar-lbl { font-size: 9px; color: #777; letter-spacing: 0.1em; text-transform: uppercase; }
     .budget-bar-wrap { height: 4px; background: #3e3e3e; border-radius: 2px; overflow: hidden; }
@@ -83,14 +121,13 @@
     .label-pill { font-size: 11px; padding: 4px 11px; border-radius: 3px; cursor: pointer; border: 1px solid transparent; font-weight: 500; letter-spacing: 0.06em; }
     .label-pill.inactive { opacity: 0.3; }
     .add-form { background: #2e2e2e; border: 1px solid #3e3e3e; border-radius: 8px; padding: 14px; margin-bottom: 16px; }
-    .add-form-row { display: flex; gap: 8px; margin-bottom: 10px; }
-    .add-input { flex: 1; height: 44px; border-radius: 4px; border: 1px solid #484848; background: #272727; color: #e0e0e0; padding: 0 10px; font-size: 16px; font-family: 'Roboto Mono', monospace; -webkit-appearance: none; }
-    .add-input:focus { outline: none; border-color: #666; }
-    .add-input::placeholder { color: #555; }
+    .add-form-row { display: flex; gap: 8px; }
+    .add-form-row input { flex: 1; margin-bottom: 10px; }
+    .add-form-row input:first-child { flex: 2; }
     .label-select-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
-    .label-sel-pill { font-size: 11px; padding: 4px 10px; border-radius: 3px; cursor: pointer; border: 1px solid transparent; font-weight: 500; opacity: 0.35; transition: opacity 0.2s, border-color 0.2s; letter-spacing: 0.04em; }
+    .label-sel-pill { font-size: 11px; padding: 4px 10px; border-radius: 3px; cursor: pointer; border: 1px solid transparent; font-weight: 500; opacity: 0.35; letter-spacing: 0.04em; }
     .label-sel-pill.selected { opacity: 1; }
-    .tx-list { display: flex; flex-direction: column; gap: 6px; }
+    .tx-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 40px; }
     .tx-item { display: flex; align-items: center; gap: 10px; padding: 12px; background: #2e2e2e; border: 1px solid #3e3e3e; border-radius: 6px; }
     .tx-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
     .tx-info { flex: 1; min-width: 0; }
@@ -99,93 +136,82 @@
     .tx-amount { font-size: 13px; font-weight: 700; flex-shrink: 0; }
     .tx-amount.neg { color: #f87171; }
     .tx-amount.pos { color: #4ade80; }
-    .del-btn { width: 24px; height: 24px; border: none; background: none; color: #555; cursor: pointer; font-size: 18px; padding: 0; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-    .del-btn:active { color: #f87171; }
+    .del-btn { width: 28px; height: 28px; border: none; background: none; color: #555; cursor: pointer; font-size: 20px; padding: 0; flex-shrink: 0; }
     .empty-state { text-align: center; padding: 32px; color: #555; font-size: 11px; letter-spacing: 0.08em; }
     .month-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .month-label { font-size: 11px; color: #888; letter-spacing: 0.12em; text-transform: uppercase; }
-    .nav-btn { width: 36px; height: 36px; border-radius: 4px; border: 1px solid #484848; background: #3e3e3e; cursor: pointer; color: #aaa; font-size: 18px; display: flex; align-items: center; justify-content: center; font-family: 'Roboto Mono', monospace; }
-    .nav-btn:active { border-color: #666; color: #fff; }
+    .nav-btn { width: 40px; height: 40px; border-radius: 4px; border: 1px solid #484848; background: #3e3e3e; cursor: pointer; color: #aaa; font-size: 20px; font-family: 'Roboto Mono', monospace; }
+    .big-btn { height: 52px; border-radius: 4px; border: none; font-size: 14px; font-weight: 700; font-family: 'Roboto Mono', monospace; cursor: pointer; letter-spacing: 0.06em; flex: 1; }
   </style>
 </head>
 <body>
-<div class="screen">
 
   <!-- HOME -->
   <div id="page-home" class="page active">
     <div class="home-title">i miei budget</div>
     <div id="proj-list"></div>
     <button class="new-proj-btn" id="open-new-btn" onclick="toggleNewForm()">+ nuovo budget</button>
-    <div class="new-proj-form" id="new-proj-form" style="display:none">
+    <div class="new-proj-form" id="new-proj-form">
       <label class="form-label">nome</label>
-      <input type="text" class="form-input" id="new-name" placeholder="es. viaggio tokyo...">
+      <input type="text" id="new-name" placeholder="es. viaggio tokyo...">
       <label class="form-label">tipo</label>
       <div class="type-row">
         <button class="type-btn active-mensile" id="type-mensile" onclick="setType('mensile')">mensile</button>
         <button class="type-btn" id="type-progetto" onclick="setType('progetto')">progetto</button>
       </div>
       <label class="form-label">budget totale (€)</label>
-      <input type="number" class="form-input" id="new-budget" placeholder="es. 1500" min="0">
+      <input type="number" id="new-budget" placeholder="es. 1500" min="0">
       <div class="confirm-btns">
-        <button onclick="createProject()" style="flex:1;height:44px;border-radius:4px;border:none;font-size:13px;font-weight:700;font-family:'Roboto Mono',monospace;cursor:pointer;background-color:#4ade80;color:#0d2218;letter-spacing:0.06em;">crea</button>
-        <button onclick="toggleNewForm()" style="flex:1;height:44px;border-radius:4px;border:1px solid #484848;font-size:13px;font-family:'Roboto Mono',monospace;cursor:pointer;background:none;color:#888;letter-spacing:0.06em;">annulla</button>
+        <button class="big-btn" onclick="createProject()" style="background:#4ade80;color:#0d2218;">crea</button>
+        <button class="big-btn" onclick="toggleNewForm()" style="background:#2e2e2e;color:#888;border:1px solid #484848;">annulla</button>
       </div>
     </div>
   </div>
 
   <!-- BUDGET PAGE -->
   <div id="page-budget" class="page">
-    <button class="back-btn" onclick="goHome()"><span style="font-size:18px">&#8249;</span> tutti i budget</button>
-    <div class="page-title" id="bud-title">—</div>
-    <div class="page-subtitle" id="bud-subtitle">—</div>
-
-    <div id="month-nav-wrap">
+    <button class="back-btn" onclick="goHome()"><span style="font-size:20px">&#8249;</span> tutti i budget</button>
+    <div class="page-title" id="bud-title"></div>
+    <div class="page-subtitle" id="bud-subtitle"></div>
+    <div id="month-nav-wrap" style="display:none">
       <div class="month-row">
         <button class="nav-btn" onclick="changeMonth(-1)">&#8249;</button>
-        <span class="month-label" id="month-lbl">apr 2026</span>
+        <span class="month-label" id="month-lbl"></span>
         <button class="nav-btn" onclick="changeMonth(1)">&#8250;</button>
       </div>
     </div>
-
     <div class="balance-area">
       <div class="balance-lbl">saldo</div>
-      <div class="balance-num" id="bud-balance" style="color:#e0e0e0">€0.00</div>
-      <div class="balance-sub" id="bud-balance-sub">budget rimanente: —</div>
+      <div class="balance-num" id="bud-balance">€0.00</div>
+      <div class="balance-sub" id="bud-balance-sub"></div>
     </div>
-
     <div class="stats-row">
       <div class="stat-card"><div class="stat-lbl">entrate</div><div class="stat-val income" id="bud-in">€0.00</div></div>
       <div class="stat-card"><div class="stat-lbl">uscite</div><div class="stat-val expense" id="bud-out">€0.00</div></div>
     </div>
-
     <div class="bar-section">
       <div class="budget-input-wrap">
-        <label>budget</label>
-        <input type="number" class="budget-val-input" id="bud-cap" min="0" oninput="saveCap();renderBudget()">
+        <label for="bud-cap">budget</label>
+        <input type="number" id="bud-cap" min="0" oninput="saveCap();renderBudget()">
       </div>
       <div class="bar-lbl-row"><span class="bar-lbl">utilizzo</span><span class="bar-lbl" id="bud-pct">0%</span></div>
       <div class="budget-bar-wrap"><div class="budget-bar-fill" id="bud-bar" style="width:0%;background:#4ade80"></div></div>
     </div>
-
     <div class="divider"></div>
     <div class="labels-row" id="bud-filter-labels"></div>
-
     <div class="add-form">
       <div class="add-form-row">
-        <input type="text" class="add-input" id="inp-desc" placeholder="descrizione..." style="flex:2">
-        <input type="number" class="add-input" id="inp-amt" placeholder="€" step="0.01" style="flex:1">
+        <input type="text" id="inp-desc" placeholder="descrizione...">
+        <input type="number" id="inp-amt" placeholder="€" step="0.01">
       </div>
       <div class="label-select-row" id="label-selector"></div>
       <div style="display:flex;gap:8px;">
-        <button onclick="addTx(1)" style="flex:1;height:48px;border-radius:4px;border:none;font-size:13px;font-weight:700;font-family:'Roboto Mono',monospace;cursor:pointer;letter-spacing:0.06em;background-color:#4ade80;color:#0d2218;">+ entrata</button>
-        <button onclick="addTx(-1)" style="flex:1;height:48px;border-radius:4px;border:none;font-size:13px;font-weight:700;font-family:'Roboto Mono',monospace;cursor:pointer;letter-spacing:0.06em;background-color:#f87171;color:#2a0808;">− uscita</button>
+        <button class="big-btn" onclick="addTx(1)" style="background:#4ade80;color:#0d2218;">+ entrata</button>
+        <button class="big-btn" onclick="addTx(-1)" style="background:#f87171;color:#2a0808;">− uscita</button>
       </div>
     </div>
-
     <div class="tx-list" id="bud-tx-list"></div>
   </div>
-
-</div>
 
 <script>
 const LABELS=[
@@ -238,18 +264,23 @@ function createProject(){
   save();toggleNewForm();renderHome();
 }
 
-function archiveProject(id,e){
-  e.stopPropagation();
+function archiveProject(id){
   const p=getProject(id);if(!p)return;
   p.archived=!p.archived;save();renderHome();
 }
 
-function deleteProject(id,e){
-  e.stopPropagation();
-  if(!confirm('Eliminare questo budget e tutte le sue transazioni?'))return;
-  data.projects=data.projects.filter(p=>p.id!==id);
-  data.transactions=data.transactions.filter(t=>t.projectId!==id);
-  save();renderHome();
+let pendingDelete=null;
+function deleteProject(id){
+  if(pendingDelete===id){
+    data.projects=data.projects.filter(p=>p.id!==id);
+    data.transactions=data.transactions.filter(t=>t.projectId!==id);
+    pendingDelete=null;
+    save();renderHome();
+  } else {
+    pendingDelete=id;
+    renderHome();
+    setTimeout(()=>{if(pendingDelete===id){pendingDelete=null;renderHome();}},3000);
+  }
 }
 
 function openProject(id){
@@ -257,7 +288,12 @@ function openProject(id){
   const proj=getProject(id);
   document.getElementById('bud-title').textContent=proj.name;
   document.getElementById('bud-subtitle').textContent=proj.type==='mensile'?'budget mensile':'progetto';
-  document.getElementById('bud-cap').value=proj.budget||0;
+  if(proj.type==='mensile'){
+    const key=currentYear+'-'+currentMonth;
+    document.getElementById('bud-cap').value=(proj.monthlyBudgets&&proj.monthlyBudgets[key])||0;
+  } else {
+    document.getElementById('bud-cap').value=proj.budget||0;
+  }
   document.getElementById('month-nav-wrap').style.display=proj.type==='mensile'?'block':'none';
   document.getElementById('page-home').className='page';
   document.getElementById('page-budget').className='page active';
@@ -275,7 +311,13 @@ function goHome(){
 
 function saveCap(){
   const proj=getProject(currentProjectId);if(!proj)return;
-  proj.budget=parseFloat(document.getElementById('bud-cap').value)||0;
+  if(proj.type==='mensile'){
+    if(!proj.monthlyBudgets) proj.monthlyBudgets={};
+    const key=currentYear+'-'+currentMonth;
+    proj.monthlyBudgets[key]=parseFloat(document.getElementById('bud-cap').value)||0;
+  } else {
+    proj.budget=parseFloat(document.getElementById('bud-cap').value)||0;
+  }
   save();
 }
 
@@ -283,6 +325,11 @@ function changeMonth(d){
   currentMonth+=d;
   if(currentMonth>11){currentMonth=0;currentYear++;}
   if(currentMonth<0){currentMonth=11;currentYear--;}
+  const proj=getProject(currentProjectId);
+  if(proj&&proj.type==='mensile'){
+    const key=currentYear+'-'+currentMonth;
+    document.getElementById('bud-cap').value=(proj.monthlyBudgets&&proj.monthlyBudgets[key])||0;
+  }
   renderBudget();
 }
 
@@ -307,7 +354,8 @@ function addTx(sign){
 function deleteTx(id){data.transactions=data.transactions.filter(t=>t.id!==id);save();renderBudget();}
 
 function renderHome(){
-  const list=document.getElementById('proj-list');list.innerHTML='';
+  const list=document.getElementById('proj-list');
+  list.innerHTML='';
   const active=data.projects.filter(p=>!p.archived);
   const archived=data.projects.filter(p=>p.archived);
   [...active,...archived].forEach(proj=>{
@@ -315,27 +363,59 @@ function renderHome(){
     const spent=Math.abs(txs.filter(t=>t.amount<0).reduce((s,t)=>s+t.amount,0));
     const pct=proj.budget>0?Math.min(100,Math.round(spent/proj.budget*100)):0;
     const barColor=pct>90?'#f87171':pct>65?'#fbbf24':'#4ade80';
-    const card=document.createElement('div');
-    card.className='proj-card'+(proj.archived?' archived':'');
-    if(!proj.archived) card.onclick=()=>openProject(proj.id);
+    const isFixed=proj.id==='__mensile__';
     const badgeClass=proj.archived?'badge-archiviato':proj.type==='mensile'?'badge-mensile':'badge-progetto';
     const badgeLabel=proj.archived?'archiviato':proj.type==='mensile'?'mensile':'progetto';
-    const isFixed=proj.id==='__mensile__';
-    card.innerHTML=`
+
+    const card=document.createElement('div');
+    card.className='proj-card'+(proj.archived?' archived':'');
+
+    // corpo cliccabile separato dai bottoni
+    const body=document.createElement('div');
+    body.className='proj-card-body';
+    if(!proj.archived){
+      body.addEventListener('click',function(){openProject(proj.id);});
+    }
+    body.innerHTML=`
       <div class="proj-card-top">
         <div class="proj-name">${proj.name}</div>
         <span class="proj-badge ${badgeClass}">${badgeLabel}</span>
       </div>
       <div class="proj-bar-wrap"><div class="proj-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
-      <div class="proj-footer">
+      <div class="proj-meta">
         <span class="proj-spent">€${spent.toFixed(2)} spesi</span>
-        <div class="proj-actions">
-          ${!isFixed?`<button class="proj-act-btn" onclick="archiveProject('${proj.id}',event)">${proj.archived?'riattiva':'archivia'}</button>`:''}
-          ${!isFixed?`<button class="proj-act-btn danger" onclick="deleteProject('${proj.id}',event)">elimina</button>`:''}
-        </div>
-        <span class="proj-budget">/ €${(proj.budget||0).toFixed(0)}</span>
+        <span class="proj-budget-lbl">/ €${(proj.budget||0).toFixed(0)}</span>
       </div>
     `;
+    card.appendChild(body);
+
+    // barra azioni separata, completamente fuori dal body cliccabile
+    if(!isFixed){
+      const actions=document.createElement('div');
+      actions.className='proj-card-actions';
+
+      const archBtn=document.createElement('button');
+      archBtn.className='proj-act-btn';
+      archBtn.textContent=proj.archived?'riattiva':'archivia';
+      archBtn.addEventListener('click',function(e){
+        e.stopPropagation();
+        archiveProject(proj.id);
+      });
+
+      const delBtn=document.createElement('button');
+      delBtn.className='proj-act-btn danger';
+      delBtn.textContent=pendingDelete===proj.id?'sicuro?':'elimina';
+      if(pendingDelete===proj.id) delBtn.style.background='#3d1a1a';
+      delBtn.addEventListener('click',function(e){
+        e.stopPropagation();
+        deleteProject(proj.id);
+      });
+
+      actions.appendChild(archBtn);
+      actions.appendChild(delBtn);
+      card.appendChild(actions);
+    }
+
     list.appendChild(card);
   });
 }
@@ -345,13 +425,15 @@ function renderFilterLabels(){
   const all=document.createElement('span');
   all.className='label-pill '+(activeFilter===null?'active':'inactive');
   all.style.cssText='background:#383838;color:#aaa;border-color:#484848';
-  all.textContent='tutte';all.onclick=()=>{activeFilter=null;renderBudget()};
+  all.textContent='tutte';
+  all.addEventListener('click',function(){activeFilter=null;renderBudget();});
   c.appendChild(all);
   LABELS.forEach(l=>{
     const sp=document.createElement('span');
     sp.className='label-pill '+(activeFilter===l.id?'active':'inactive');
     sp.style.cssText=`background:${l.bg};color:${l.color};border-color:${activeFilter===l.id?l.color:'transparent'}`;
-    sp.textContent=l.name;sp.onclick=()=>{activeFilter=activeFilter===l.id?null:l.id;renderBudget()};
+    sp.textContent=l.name;
+    sp.addEventListener('click',function(){activeFilter=activeFilter===l.id?null:l.id;renderBudget();});
     c.appendChild(sp);
   });
 }
@@ -362,7 +444,8 @@ function renderLabelSelector(){
     const sp=document.createElement('span');
     sp.className='label-sel-pill '+(selectedLabel===l.id?'selected':'');
     sp.style.cssText=`background:${l.bg};color:${l.color};border-color:${selectedLabel===l.id?l.color:'transparent'}`;
-    sp.textContent=l.name;sp.onclick=()=>{selectedLabel=l.id;renderLabelSelector()};
+    sp.textContent=l.name;
+    sp.addEventListener('click',function(){selectedLabel=l.id;renderLabelSelector();});
     c.appendChild(sp);
   });
 }
@@ -379,7 +462,13 @@ function renderBudget(){
   const bn=document.getElementById('bud-balance');
   bn.textContent=(balance>=0?'+':'')+'€'+balance.toFixed(2);
   bn.style.color=balance>=0?'#4ade80':'#f87171';
-  const cap=proj.budget||0;
+  let cap;
+  if(proj.type==='mensile'){
+    const key=currentYear+'-'+currentMonth;
+    cap=(proj.monthlyBudgets&&proj.monthlyBudgets[key])||0;
+  } else {
+    cap=proj.budget||0;
+  }
   const spent=Math.abs(totalOut);
   const pct=cap>0?Math.min(100,Math.round(spent/cap*100)):0;
   document.getElementById('bud-pct').textContent=pct+'%';
